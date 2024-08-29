@@ -76,8 +76,6 @@ def model_trainer(data, env, time_limit=300):
 ############
 
 def controller(x, f, sp, env, u_prev):
-
-
     """
     Model Predictive Controller
     
@@ -92,7 +90,10 @@ def controller(x, f, sp, env, u_prev):
     Returns:
     optimal_control: First control action from MPC optimization
     """
-    horizon = 10 # Control horizon
+    controller.team_names = ['Max Bloor', 'Antonio Del Rio Chanona']
+    controller.cids = ['01234567', '01234567']
+    
+    horizon = 2 # Control horizon
     x_current = x[1]
 
     n_controls = env.env_params['a_space']['low'].shape[0]
@@ -109,8 +110,8 @@ def controller(x, f, sp, env, u_prev):
     def objective(u_sequence):
         cost = 0
         x_pred = x_current
-        R = 1 # Weight for control effort
-        Q =  10 # Weight for state error
+        R = 1000 # Weight for control effort
+        Q =  500 # Weight for state error
 
         for i in range(horizon):
             # State cost
@@ -137,4 +138,4 @@ def controller(x, f, sp, env, u_prev):
     optimal_control = result.x[:2]
     optimal_control = (optimal_control + 1) / 2 * (env.env_params['a_space']['high'] - env.env_params['a_space']['low']) + env.env_params['a_space']['low']
     
-    return optimal_control
+    return optimal_control 
