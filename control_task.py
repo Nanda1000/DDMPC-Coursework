@@ -45,7 +45,8 @@ env = make_env(env_params_ms)
 #Import pre-defined data#
 #########################
 
-
+data_states = np.load('./time_series/data_states.npy')
+data_controls = np.load('./time_series/data_control.npy')
 
 
 ###################
@@ -53,8 +54,7 @@ env = make_env(env_params_ms)
 ###################
 
 N_sim = int(50) # Budget for simulations to gather extra data 
-data_states = np.load('./time_series/data_states.npy')
-data_controls = np.load('./time_series/data_control.npy')
+
 
 for i in range(N_sim):
     x_log, u_log = rollout(env=env, explore=True, explorer=explorer)
@@ -67,7 +67,6 @@ data = (data_states, data_controls)
 #################
 # Training Phase#
 #################
-
 
 model = model_trainer(data,env)
 
@@ -82,5 +81,5 @@ for i in range(N_reps):
     x_log[:, :, i], u_log[:, :, i] = rollout(env=env, explore=False, controller=controller, model=model)
 
 plot_simulation_results(x_log, u_log, env)
-score = np.sum((np.median(x_log[1,:,:], axis = 1) - env.SP['Y1']))**2 + 0.001*np.sum((u_log)**2)
+score = np.sum((np.median(x_log[1,:,:], axis = 1) - env.SP['Y1']))**2 + 0.0001*np.sum((u_log)**2)
 print("Score:", score)

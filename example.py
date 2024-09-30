@@ -30,15 +30,27 @@ def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
 #Example Model Training#
 ########################
 
-def model_trainer(data, env, time_limit=300):
+def model_trainer(data: np.array, env: callable) -> callable:
+    """
+    Trains a linear regression model using the provided data and environment parameters.
+    Parameters:
+    data (np.array): A tuple containing two numpy arrays: data_states and data_controls.
+                    data_states is a 3D array with shape (reps, states, n_steps).
+                    data_controls is a 3D array with shape (reps, controls, n_steps).
+    env (callable): An environment object that contains the environment parameters.
+    Returns:
+    model (LinearRegression): The trained linear regression model.
+    """
     data_states, data_controls = data
     
     # Select only states with indices 1 and 8
     selected_states = data_states[:, [1, 8], :]
     
     # Normalize the selected states and controls
-    selected_states_norm = (selected_states - env.env_params['o_space']['low'][[1, 8]].reshape(1, -1, 1)) / (env.env_params['o_space']['high'][[1, 8]].reshape(1, -1, 1) - env.env_params['o_space']['low'][[1, 8]].reshape(1, -1, 1)) * 2 - 1
-    data_controls_norm = (data_controls - env.env_params['a_space']['low'].reshape(1, -1, 1)) / (env.env_params['a_space']['high'].reshape(1, -1, 1) - env.env_params['a_space']['low'].reshape(1, -1, 1)) * 2 - 1
+    o_low, o_high = env.env_params['o_space']['low'][[1, 8]], env.env_params['o_space']['high'][[1, 8]]
+    a_low, a_high = env.env_params['a_space']['low'], env.env_params['a_space']['high']
+    selected_states_norm = (selected_states - o_low.reshape(1, -1, 1)) / (o_high.reshape(1, -1, 1) - o_low.reshape(1, -1, 1)) * 2 - 1
+    data_controls_norm = (data_controls - a_low.reshape(1, -1, 1)) / (a_high.reshape(1, -1, 1) - a_low.reshape(1, -1, 1)) * 2 - 1
 
     # Get the dimensions
     reps, states, n_steps = selected_states_norm.shape
@@ -69,71 +81,49 @@ def model_trainer(data, env, time_limit=300):
 
 
 
-############
-# Optimiser#
-############
+####################
+#Example Controller#
+####################
 
-def controller(x, f, sp, env, u_prev):
-    """
-    Model Predictive Controller
-    
-    Args:
-    x (numpy.array): Current state of the system.
-    f (object): Your trained model used for predicting the next state.
-    sp (numpy.array): Setpoint for the system.
-    env (object): Environment object containing parameters.
-    u_prev (numpy.array): Previous control action.
-    numpy.array: First control action from MPC optimization.
-
-    Returns:
-    optimal_control: First control action from MPC optimization
-    """
+def controller(x: np.array, f: callable, sp: callable, env: callable, u_prev: np.array) -> np.array:
+    # Add names of team members and their respective CIDs
     controller.team_names = ['Max Bloor', 'Antonio Del Rio Chanona']
     controller.cids = ['01234567', '01234567']
-    
-    horizon = 2 # Control horizon
-    x_current = x[1]
 
-    n_controls = env.env_params['a_space']['low'].shape[0]
-    u_prev = (u_prev - env.env_params['a_space']['low']) / (env.env_params['a_space']['high'] - env.env_params['a_space']['low']) * 2 - 1
+    o_space = env.env_params['o_space']
+    a_space = env.env_params['a_space']
     
+    horizon = 2 # Control Horizon
+    x_current = x[1] # Current state
+
+    n_controls = a_space['low'].shape[0]
+    u_prev = (u_prev - a_space['low']) / (a_space['high'] - a_space['low']) * 2 - 1
+    
+    # Prediction function with data-driven model
     def predict_next_state(current_state, control):
-        # Ensure the input is normalized as in the training data
-        current_state_norm = (current_state - env.env_params['o_space']['low'][[1,8]]) / (env.env_params['o_space']['high'][[1,8]] - env.env_params['o_space']['low'][[1,8]]) * 2 - 1
+        current_state_norm = (current_state - o_space['low'][[1, 8]]) / (o_space['high'][[1, 8]] - o_space['low'][[1, 8]]) * 2 - 1
         x = np.hstack([current_state_norm, control])
         prediction = f.predict(x.reshape(1, -1)).flatten()
-        prediction = (prediction + 1) / 2 * (env.env_params['o_space']['high'][[1,8]] - env.env_params['o_space']['low'][[1,8]]) + env.env_params['o_space']['low'][[1,8]]
-        return prediction.flatten()
+        return (prediction + 1) / 2 * (o_space['high'][[1, 8]] - o_space['low'][[1, 8]]) + o_space['low'][[1, 8]]
     
+    # Controller objective function 
     def objective(u_sequence):
-        cost = 0
-        x_pred = x_current
-        R = 1000 # Weight for control effort
-        Q =  500 # Weight for state error
-
+        cost, x_pred, R, Q = 0, x_current, 3, 500
         for i in range(horizon):
-            # State cost
             error = x_pred - sp
-            cost += np.sum((error)**2) * Q
-
+            cost += np.sum(error**2) * Q
             u_current = u_sequence[i*n_controls:(i+1)*n_controls]
-            delta_u = u_current - u_prev
-            cost += np.sum(np.square(delta_u)) * R 
+            cost += np.sum((u_current - u_prev)**2) * R
             x_pred = predict_next_state(x_pred, u_current)
-        
         return cost
     
-    u_init = np.ones((horizon, 2))*u_prev
-    bounds = []
+    # Initial control guess and bounds (working in normalised control inputs)
+    u_init = np.ones((horizon, 2)) * u_prev
     bounds = [(-1, 1)] * (horizon * n_controls)
-
-    result = minimize(
-        objective,
-        u_init.flatten(),
-        method='powell',
-        bounds=bounds
-    )
-    optimal_control = result.x[:2]
-    optimal_control = (optimal_control + 1) / 2 * (env.env_params['a_space']['high'] - env.env_params['a_space']['low']) + env.env_params['a_space']['low']
     
-    return optimal_control 
+    # Use scipy minimize to optimise the control cost
+    result = minimize(objective, u_init.flatten(), method='powell', bounds=bounds)
+
+    # Return the control input in the actual bounds
+    optimal_control = result.x[:2]
+    return (optimal_control + 1) / 2 * (a_space['high'] - a_space['low']) + a_space['low']

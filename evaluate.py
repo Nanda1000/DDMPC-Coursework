@@ -1,10 +1,5 @@
 import numpy as np
 import time
-
-######### NOT VISIBLE TO STUDENTS ############
-
-# Evaluate on different setpoints
-
 from pcgym import make_env # Give it a star on Github :)
 from utils import reward_fn, rollout, plot_simulation_results, visualise_collected_data # functions to make the code below more readable 
 from example import explorer, model_trainer, controller # Your algorithms 
@@ -79,6 +74,8 @@ model = model_trainer(data,env)
 end_time = time.time()
 model_training_time = end_time - start_time
 print(f'Model training time: {model_training_time:.2f} seconds')
+
+
 ###############
 #Control Phase#
 ###############
@@ -111,7 +108,7 @@ for setpoint_index in range(num_setpoints):
     print(f'Total (inc. exploration and training): {exploration_time + model_training_time + execution_time:.2f} seconds')
 
   plot_simulation_results(x_log, u_log, env)
-  score = np.sum((np.median(x_log[1,:,:], axis = 1) - env.SP['Y1']))**2 + 0.001*np.sum((u_log)**2)
+  score = np.sum((np.median(x_log[1,:,:], axis = 1) - env.SP['Y1']))**2 + 0.00001*np.sum((u_log)**2)
   print("Score for Setpoint", setpoint_index + 1, ":", score)
   scores.append(score)
 
