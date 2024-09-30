@@ -1,11 +1,8 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from scipy.optimize import minimize, Bounds
+from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error, r2_score
-import time
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
 
 ##############################
 # Example Exploration Scheme #
@@ -13,8 +10,7 @@ from scipy import stats
 
 def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
     '''
-    Function to collect more data to train state-space model using step changes every 30 timesteps
-    Inputs:
+    Function to collect more data to train the model.
     x_t (np.array) - Current state 
     u_bounds (dict) - Bounds on control inputs
     timestep (int) - Current timestep
@@ -25,7 +21,9 @@ def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
     u_lower = u_bounds['low']
     u_upper = u_bounds['high']
 
-    return np.random.uniform(u_lower, u_upper, size=u_lower.shape)
+    u_plus = np.random.uniform(u_lower, u_upper, size=u_lower.shape)
+    
+    return u_plus
     
 
 ########################
