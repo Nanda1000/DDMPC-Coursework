@@ -1,4 +1,3 @@
-######### NOT VISIBLE TO STUDENTS ############
 import numpy as np
 
 def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
