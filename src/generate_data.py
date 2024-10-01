@@ -1,5 +1,7 @@
 import numpy as np
-
+###################################################
+# You do not need to change anything in this file #
+###################################################
 def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
     '''
     Function to collect more data to train state-space model using step changes every 30 timesteps

@@ -7,7 +7,9 @@ import numpy as np
 ##############################
 # Example Exploration Scheme #
 ##############################
-
+####################################
+# Please modify the functoin below #
+####################################
 def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
     '''
     Function to collect more data to train the model.
@@ -29,7 +31,9 @@ def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
 ########################
 #Example Model Training#
 ########################
-
+####################################
+# Please modify the functoin below #
+####################################
 def model_trainer(data: np.array, env: callable) -> callable:
     """
     Trains a linear regression model using the provided data and environment parameters.
@@ -84,7 +88,9 @@ def model_trainer(data: np.array, env: callable) -> callable:
 ####################
 #Example Controller#
 ####################
-
+####################################
+# Please modify the functoin below #
+####################################
 def controller(x: np.array, f: callable, sp: callable, env: callable, u_prev: np.array) -> np.array:
     # Add names of team members and their respective CIDs
     controller.team_names = ['Max Bloor', 'Antonio Del Rio Chanona']

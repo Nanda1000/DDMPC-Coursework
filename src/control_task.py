@@ -1,8 +1,10 @@
 from pcgym import make_env # Give it a star on Github :)
 import numpy as np
 from utils import reward_fn, rollout, plot_simulation_results, visualise_collected_data # functions to make the code below more readable 
-from example import explorer, model_trainer, controller # Your algorithms 
-
+from your_alg import explorer, model_trainer, controller # Your algorithms 
+###################################################
+# You do not need to change anything in this file #
+###################################################
 
 #######################################
 #  Multistage Extraction Column model #

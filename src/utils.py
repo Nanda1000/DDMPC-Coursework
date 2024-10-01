@@ -1,7 +1,9 @@
 import numpy as np
 from typing import Callable
 import matplotlib.pyplot as plt
-
+###################################################
+# You do not need to change anything in this file #
+###################################################
 def reward_fn(self, x:np.array, u:np.array, con: bool) -> float:
     Sp_i = 0
     cost = 0 
