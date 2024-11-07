@@ -43,5 +43,6 @@ In this coursework, you will design a data-driven model predictive controller (M
 Your team’s submission will be **three** functions:
   1. Data-gathering routine
   2. Model training
-  3. Controller.
+  3. Controller
+
 These form your best attempt at controlling the multistage extraction column system using a data-driven MPC.
