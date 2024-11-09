@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
-
+np.random.seed(42)
 ##############################
 # Example Exploration Scheme #
 ##############################
@@ -20,9 +20,11 @@ def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
     Output:
     u_plus - Next control input
     '''
+
     u_lower = u_bounds['low']
     u_upper = u_bounds['high']
 
+    
     u_plus = np.random.uniform(u_lower, u_upper, size=u_lower.shape)
     
     return u_plus
@@ -91,13 +93,16 @@ def model_trainer(data: np.array, env: callable) -> callable:
 ####################################
 # Please modify the functoin below #
 ####################################
-def controller(x: np.array, f: callable, sp: callable, env: callable, u_prev: np.array) -> np.array:
+def controller(x: np.array, f: callable, sp: callable, env: callable, u_prev: np.array,) -> np.array:
     # Add names of team members and their respective CIDs
     controller.team_names = ['Max Bloor', 'Antonio Del Rio Chanona']
     controller.cids = ['01234567', '01234567']
 
     o_space = env.env_params['o_space']
     a_space = env.env_params['a_space']
+    
+    Q = 10 # state cost
+    R = 500 # control cost
     
     horizon = 2 # Control Horizon
     x_current = x[1] # Current state
@@ -114,7 +119,8 @@ def controller(x: np.array, f: callable, sp: callable, env: callable, u_prev: np
     
     # Controller objective function 
     def objective(u_sequence):
-        cost, x_pred, R, Q = 0, x_current, 3, 500
+        cost = 0
+        x_pred = x_current
         for i in range(horizon):
             error = x_pred - sp
             cost += np.sum(error**2) * Q
