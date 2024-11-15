@@ -2,7 +2,7 @@ import numpy as np
 import time
 from pcgym import make_env # Give it a star on Github :)
 from utils import reward_fn, rollout, plot_simulation_results, visualise_collected_data # functions to make the code below more readable 
-from your_alg import explorer, model_trainer, controller # Your algorithms 
+from your_alg import explorer, model_trainer, controller # Your algorithms (you may need to change the "your_alg" to the actual name)
 ###################################################
 # You do not need to change anything in this file #
 ###################################################
@@ -114,7 +114,7 @@ for rep in range(reps):
       print(f'Controller Execution time: {execution_time:.2f} seconds')
       print(f'Total (inc. exploration and training): {exploration_time + model_training_time + execution_time:.2f} seconds')
 
-    # plot_simulation_results(x_log, u_log, env)
+    plot_simulation_results(x_log, u_log, env)
     score = np.sum((np.median(x_log[1,:,:], axis = 1) - env.SP['Y1']))**2 + 0.00001*np.sum((u_log)**2)
     print("Score for Setpoint", setpoint_index + 1, ":", score)
     scores.append(score)

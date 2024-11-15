@@ -3,12 +3,12 @@ from sklearn.model_selection import train_test_split
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
-np.random.seed(42)
+
 ##############################
 # Example Exploration Scheme #
 ##############################
 ####################################
-# Please modify the functoin below #
+# Please modify the function below #
 ####################################
 def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
     '''
@@ -34,7 +34,7 @@ def explorer(x_t: np.array, u_bounds: dict, timestep: int) -> np.array:
 #Example Model Training#
 ########################
 ####################################
-# Please modify the functoin below #
+# Please modify the function below #
 ####################################
 def model_trainer(data: np.array, env: callable) -> callable:
     """
@@ -91,7 +91,7 @@ def model_trainer(data: np.array, env: callable) -> callable:
 #Example Controller#
 ####################
 ####################################
-# Please modify the functoin below #
+# Please modify the function below #
 ####################################
 def controller(x: np.array, f: callable, sp: callable, env: callable, u_prev: np.array,) -> np.array:
     # Add names of team members and their respective CIDs
