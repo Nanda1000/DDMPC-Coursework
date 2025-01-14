@@ -10,7 +10,7 @@ This repository contains the third coursework for the Machine Learning for Chemi
 
 With conda:
 ```bash
-git clone https://github.com/username/repository.git
+git clone https://github.com/Nanda1000/DDMPC-Coursework.git/
 cd repository
 conda env create -f environment.yaml
 conda activate myenv
